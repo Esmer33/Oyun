@@ -1,36 +1,32 @@
+const startScreen = document.getElementById("startScreen");
+const startBtn = document.getElementById("startBtn");
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-let player = { x: 50, y: 200, width: 30, height: 30, speed: 3 };
-let candy = { x: 300, y: 200, width: 20, height: 20 };
+let player = { x: 50, y: 400, width: 30, height: 30, speed: 4 };
+let candy = { x: 200, y: 100, width: 20, height: 20 };
+let keys = {};
 let score = 0;
 
-// Oyunu çizen fonksiyon
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+startBtn.addEventListener("click", () => {
+  startScreen.style.display = "none";
+  canvas.style.display = "block";
+  gameLoop();
+});
 
-  // Oyuncu
-  ctx.fillStyle = "#ff6ec7";
-  ctx.fillRect(player.x, player.y, player.width, player.height);
+document.addEventListener("keydown", (e) => (keys[e.key] = true));
+document.addEventListener("keyup", (e) => (keys[e.key] = false));
 
-  // Tatlı
-  ctx.fillStyle = "#ffcc00";
-  ctx.fillRect(candy.x, candy.y, candy.width, candy.height);
-
-  // Skor
-  ctx.fillStyle = "#000";
-  ctx.font = "16px Arial";
-  ctx.fillText("Skor: " + score, 10, 20);
-}
-
-// Hareket ve çarpışma kontrolü
 function update() {
   if (keys["ArrowRight"]) player.x += player.speed;
   if (keys["ArrowLeft"]) player.x -= player.speed;
   if (keys["ArrowUp"]) player.y -= player.speed;
   if (keys["ArrowDown"]) player.y += player.speed;
 
-  // Çarpışma
+  // Ekran dışına çıkmasını engelle
+  player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+  player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
+
   if (
     player.x < candy.x + candy.width &&
     player.x + player.width > candy.x &&
@@ -43,16 +39,22 @@ function update() {
   }
 }
 
-// Klavye Kontrolü
-let keys = {};
-document.addEventListener("keydown", (e) => (keys[e.key] = true));
-document.addEventListener("keyup", (e) => (keys[e.key] = false));
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-// Ana döngü
+  ctx.fillStyle = "#ff69b4";
+  ctx.fillRect(player.x, player.y, player.width, player.height);
+
+  ctx.fillStyle = "#ffa500";
+  ctx.fillRect(candy.x, candy.y, candy.width, candy.height);
+
+  ctx.fillStyle = "#333";
+  ctx.font = "20px Arial";
+  ctx.fillText("Skor: " + score, 10, 30);
+}
+
 function gameLoop() {
   update();
   draw();
   requestAnimationFrame(gameLoop);
 }
-
-gameLoop();
